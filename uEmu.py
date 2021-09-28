@@ -6,7 +6,7 @@
 #  Copyright (c) 2017 Alexander Hude. All rights reserved.
 #
 
-UEMU_USE_AS_SCRIPT      = True    # Set to `False` if you want to load uEmu automatically as IDA Plugin
+UEMU_USE_AS_SCRIPT      = False   # Set to `False` if you want to load uEmu automatically as IDA Plugin
 
 # === Import
 
@@ -1752,6 +1752,7 @@ class uEmuPlugin(plugin_t, UI_Hooks):
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":jmp_pc",            self.jump_to_pc,            "Jump to PC",                 "Jump to PC",                "SHIFT+CTRL+ALT+J",     True    ))
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":cng_cpu",           self.change_cpu_context,    "Change CPU Context",         "Change CPU Context",        None,                   True    ))
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem("-",                                     self.do_nothing,            "",                           None,                        None,                   True    ))
+        self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":custom_view",       self.start_custom_layout,   "Start with Custom Layout",   "Start with Custom Layout",  None,                   True    ))
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":ctl_view",          self.show_controls,         "Show Controls",              "Show Control Window",       None,                   True    ))
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":cpu_view",          self.show_cpu_context,      "Show CPU Context",           "Show CPU Registers",        None,                   True    ))
         self.MENU_ITEMS.append(UEMU_HELPERS.MenuItem(self.plugin_name + ":cpu_ext_view",      self.show_cpu_ext_context,  "Show CPU Extended Context",  "Show Extended Registers",   None,                   True    ))
@@ -1935,6 +1936,15 @@ class uEmuPlugin(plugin_t, UI_Hooks):
             self.cpuContextView.SetContent(self.unicornEngine.pc, self.unicornEngine.mu)
         if self.cpuExtContextView is not None:
             self.cpuExtContextView.SetContent(self.unicornEngine.pc, self.unicornEngine.mu)
+
+    def start_custom_layout(self):
+        self.emu_start()
+        self.show_controls()
+        set_dock_pos("uEmu Control", "IDA View-A", DP_RIGHT)
+        self.show_cpu_context()
+        set_dock_pos("uEmu CPU Context", "uEmu Control", DP_BOTTOM)
+        self.show_stack_view()
+        set_dock_pos("uEmu Stack View", "uEmu CPU Context", DP_BOTTOM)
 
     def show_controls(self):
         if self.controlView is None:
